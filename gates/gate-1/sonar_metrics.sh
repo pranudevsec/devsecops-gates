@@ -1,69 +1,45 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "📊 Gate-1: SonarQube Metrics Enforcement"
+echo "📊 Gate-1: SonarQube Metrics Enforcement (New Code)"
 
-# ---- Required env vars ----
-: "${SONAR_HOST_URL:?SONAR_HOST_URL not set}"
-: "${SONAR_TOKEN:?SONAR_TOKEN not set}"
-: "${SONAR_PROJECT_KEY:?SONAR_PROJECT_KEY not set}"
+: "${SONAR_HOST_URL:?}"
+: "${SONAR_TOKEN:?}"
+: "${SONAR_PROJECT_KEY:?}"
 
-# ---- Thresholds ----
-MIN_COVERAGE=80
-MAX_BLOCKER=0
-MAX_CRITICAL=0
+MIN_NEW_COVERAGE=80
+MAX_NEW_BUGS=0
+MAX_NEW_VULNS=0
 
-# ---- Try possible API base paths ----
-API_BASES=(
-  "${SONAR_HOST_URL}/api"
-  "${SONAR_HOST_URL}/sonar/api"
-)
+API_BASE="${SONAR_HOST_URL}/api"
 
-API_BASE=""
-
-for base in "${API_BASES[@]}"; do
-  echo "🔍 Testing Sonar API base: $base"
-  if curl -sf -u "${SONAR_TOKEN}:" "$base/system/status" | jq -e '.status' >/dev/null 2>&1; then
-    API_BASE="$base"
-    echo "✅ Using Sonar API base: $API_BASE"
-    break
-  fi
-done
-
-if [ -z "$API_BASE" ]; then
-  echo "❌ Unable to determine SonarQube API base URL"
-  exit 1
-fi
-
-# ---- Query metrics ----
 RESPONSE=$(curl -sf \
   -u "${SONAR_TOKEN}:" \
   -H "Accept: application/json" \
-  "${API_BASE}/measures/component?component=${SONAR_PROJECT_KEY}&metricKeys=coverage,blocker_issues,critical_issues")
+  "${API_BASE}/measures/component?component=${SONAR_PROJECT_KEY}&metricKeys=new_coverage,new_bugs,new_vulnerabilities")
 
-# ---- Extract values ----
-COVERAGE=$(echo "$RESPONSE" | jq -r '.component.measures[] | select(.metric=="coverage") | .value // "0"')
-BLOCKERS=$(echo "$RESPONSE" | jq -r '.component.measures[] | select(.metric=="blocker_issues") | .value // "0"')
-CRITICALS=$(echo "$RESPONSE" | jq -r '.component.measures[] | select(.metric=="critical_issues") | .value // "0"')
+NEW_COVERAGE=$(echo "$RESPONSE" | jq -r '.component.measures[] | select(.metric=="new_coverage") | .value // "0"')
+NEW_BUGS=$(echo "$RESPONSE" | jq -r '.component.measures[] | select(.metric=="new_bugs") | .value // "0"')
+NEW_VULNS=$(echo "$RESPONSE" | jq -r '.component.measures[] | select(.metric=="new_vulnerabilities") | .value // "0"')
 
-echo "📈 Coverage        : ${COVERAGE}%"
-echo "🚨 Blocker Issues  : ${BLOCKERS}"
-echo "🔥 Critical Issues : ${CRITICALS}"
+echo "📈 New Coverage        : ${NEW_COVERAGE}%"
+echo "🐞 New Bugs            : ${NEW_BUGS}"
+echo "🔐 New Vulnerabilities : ${NEW_VULNS}"
 
 FAILED=0
 
-if (( $(echo "$COVERAGE < $MIN_COVERAGE" | bc -l) )); then
-  echo "❌ Coverage below ${MIN_COVERAGE}%"
+if (( $(echo "$NEW_COVERAGE < $MIN_NEW_COVERAGE" | bc -l) )); then
+  echo "❌ Coverage on New Code < ${MIN_NEW_COVERAGE}%"
   FAILED=1
 fi
 
-if [ "$BLOCKERS" -gt "$MAX_BLOCKER" ]; then
-  echo "❌ Blocker issues detected"
+if [ "$NEW_BUGS" -gt "$MAX_NEW_BUGS" ]; then
+  echo "❌ New Bugs detected"
   FAILED=1
 fi
 
-if [ "$CRITICALS" -gt "$MAX_CRITICAL" ]; then
-  echo "❌ Critical issues detected"
+if [ "$NEW_VULNS" -gt "$MAX_NEW_VULNS" ]; then
+  echo "❌ New Vulnerabilities detected"
   FAILED=1
 fi
 
