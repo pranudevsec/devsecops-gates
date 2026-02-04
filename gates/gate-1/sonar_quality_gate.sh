@@ -5,9 +5,9 @@ echo "🔍 Gate-1: SonarQube Quality Gate"
 
 : "${SONAR_HOST_URL:?SONAR_HOST_URL not set}"
 : "${SONAR_PROJECT_KEY:?SONAR_PROJECT_KEY not set}"
-: "${SONAR_TOKEN:?SONAR_TOKEN not set}"
+: "${SONAR_AUTH_TOKEN:?SONAR_AUTH_TOKEN not set}"
 
-STATUS=$(curl -s -u "${SONAR_TOKEN}:" \
+STATUS=$(curl -s -u "${SONAR_AUTH_TOKEN}:" \
   "${SONAR_HOST_URL}/api/qualitygates/project_status?projectKey=${SONAR_PROJECT_KEY}" \
   | jq -r '.projectStatus.status')
 
