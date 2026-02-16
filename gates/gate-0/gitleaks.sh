@@ -4,7 +4,7 @@ set -euo pipefail
 echo "🔍 Gate-0A: Gitleaks Secret Detection"
 
 REPORT_DIR="security-reports/gitleaks"
-REPORT_FILE="$REPORT_DIR/gitleaks-report.html"
+REPORT_FILE="$REPORT_DIR/gitleaks-report.json"
 
 mkdir -p "$REPORT_DIR"
 
@@ -30,7 +30,7 @@ docker run --rm \
     --no-git \
     --config=/config.toml \
     --redact \
-    --report-format=html \
+    --report-format=json \
     --report-path=/repo/$REPORT_FILE
 
 # If report exists and is non-empty → check findings
