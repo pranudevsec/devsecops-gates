@@ -1,0 +1,17 @@
+title = "Enterprise Secret Detection Policy"
+
+[allowlist]
+description = "Ignore generated and non-developer files"
+
+paths = [
+  "^\\.git/",
+  "^\\.scannerwork/",
+  "^node_modules/",
+  "^dist/",
+  "^build/",
+  "^target/",
+  "^coverage/",
+  "^security-reports/",
+  "dependency-check.*",
+  "trivy-.*"
+]
