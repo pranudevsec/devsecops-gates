@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "🛡️ Gate-2: Dependency CVE Policy"
+echo "🛡️ Gate-2: CVSS-Based Vulnerability Policy"
 
 REPORT="dependency-check-report.json"
 
@@ -10,24 +10,35 @@ if [ ! -f "$REPORT" ]; then
   exit 2
 fi
 
-CRITICAL=$(jq '[.dependencies[].vulnerabilities[]? | select(.severity=="CRITICAL")] | length' "$REPORT")
-HIGH=$(jq '[.dependencies[].vulnerabilities[]? | select(.severity=="HIGH")] | length' "$REPORT")
+# Count CVSS >= 9.0 (Critical)
+CRITICAL_COUNT=$(jq '
+  [.dependencies[].vulnerabilities[]? 
+   | (.cvssv3.baseScore // .cvssv2.score // 0) 
+   | select(. >= 9.0)] 
+  | length
+' "$REPORT")
 
-echo "🔎 Vulnerability Summary:"
-echo "CRITICAL: $CRITICAL"
-echo "HIGH: $HIGH"
+# Count CVSS >= 7.0 and < 9.0 (High)
+HIGH_COUNT=$(jq '
+  [.dependencies[].vulnerabilities[]? 
+   | (.cvssv3.baseScore // .cvssv2.score // 0) 
+   | select(. >= 7.0 and . < 9.0)] 
+  | length
+' "$REPORT")
 
-# 🔴 STRICT CRITICAL POLICY
-if [ "$CRITICAL" -ne 0 ]; then
-  echo "❌ CRITICAL vulnerabilities must be 0"
+echo "🔎 CVSS Summary:"
+echo "Critical (>=9.0): $CRITICAL_COUNT"
+echo "High (>=7.0 <9.0): $HIGH_COUNT"
+
+if [ "$CRITICAL_COUNT" -ne 0 ]; then
+  echo "❌ CVSS >= 9.0 vulnerabilities detected"
   exit 1
 fi
 
-# 🟠 HIGH POLICY
-if [ "$HIGH" -gt 5 ]; then
-  echo "❌ Too many HIGH vulnerabilities"
+if [ "$HIGH_COUNT" -gt 5 ]; then
+  echo "❌ Too many CVSS >= 7.0 vulnerabilities"
   exit 1
 fi
 
-echo "✅ CVE policy compliant"
+echo "✅ CVSS policy compliant"
 
