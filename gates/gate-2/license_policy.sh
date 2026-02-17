@@ -5,7 +5,16 @@ echo "📜 Gate-2: License Policy"
 
 FORBIDDEN="GPL|AGPL|LGPL"
 
-jq -r '.dependencies[].licenses[].license.name' dependency-check-report.json \
-  | grep -E "$FORBIDDEN" && exit 1 || true
+if [ ! -f dependency-check-report.json ]; then
+  echo "❌ Report not found"
+  exit 2
+fi
+
+jq -r '.dependencies[].licenses[]?.license?.name // empty' dependency-check-report.json \
+  | grep -E "$FORBIDDEN" && {
+      echo "❌ Forbidden license detected"
+      exit 1
+    } || true
 
 echo "✅ License policy compliant"
+
