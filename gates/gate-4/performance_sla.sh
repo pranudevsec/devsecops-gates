@@ -10,11 +10,13 @@ if [ ! -f "$REPORT_FILE" ]; then
   exit 1
 fi
 
-AVG_RESPONSE=$(awk -F',' '{sum+=$2} END {if (NR>0) print sum/NR; else print 0}' $REPORT_FILE)
+# Skip CSV header row
+AVG_RESPONSE=$(awk -F',' 'NR>1 {sum+=$2; count++} END {if (count>0) print sum/count; else print 0}' $REPORT_FILE)
 
-echo "Average Response Time: $AVG_RESPONSE ms"
+echo "📊 Average Response Time: $AVG_RESPONSE ms"
 
-if (( $(echo "$AVG_RESPONSE > 2000" | bc -l) )); then
+# SLA threshold (2000 ms)
+if echo "$AVG_RESPONSE > 2000" | bc -l | grep -q 1; then
   echo "❌ SLA breach: Avg response time exceeded 2000 ms"
   exit 1
 fi
