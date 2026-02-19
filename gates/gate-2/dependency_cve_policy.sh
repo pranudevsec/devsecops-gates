@@ -21,28 +21,28 @@ fi
 
 CRITICAL_COUNT=$(jq '
   [.dependencies[].vulnerabilities[]? 
-   | (.cvssv3.baseScore // .cvssv2.score // 0) 
+   | (.cvssV3.baseScore // .cvssV2.score // 0) 
    | select(. >= 9.0)] 
   | length
 ' "$REPORT")
 
 HIGH_COUNT=$(jq '
   [.dependencies[].vulnerabilities[]? 
-   | (.cvssv3.baseScore // .cvssv2.score // 0) 
+   | (.cvssV3.baseScore // .cvssV2.score // 0) 
    | select(. >= 7.0 and . < 9.0)] 
   | length
 ' "$REPORT")
 
 MEDIUM_COUNT=$(jq '
   [.dependencies[].vulnerabilities[]? 
-   | (.cvssv3.baseScore // .cvssv2.score // 0) 
+   | (.cvssV3.baseScore // .cvssV2.score // 0) 
    | select(. >= 4.0 and . < 7.0)] 
   | length
 ' "$REPORT")
 
 LOW_COUNT=$(jq '
   [.dependencies[].vulnerabilities[]? 
-   | (.cvssv3.baseScore // .cvssv2.score // 0) 
+   | (.cvssV3.baseScore // .cvssV2.score // 0) 
    | select(. > 0 and . < 4.0)] 
   | length
 ' "$REPORT")
