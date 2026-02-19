@@ -42,6 +42,12 @@ LOW_COUNT=$(jq '
    | select(. > 0 and . < 4)] | length
 ' "$REPORT")
 
+TOTAL_COUNT=$(jq '
+  [.dependencies[].vulnerabilities[]?]
+  | length
+' "$REPORT")
+
+
 
 # --------------------------------------------
 # 3️⃣ Print Summary (For Jenkins Console)
