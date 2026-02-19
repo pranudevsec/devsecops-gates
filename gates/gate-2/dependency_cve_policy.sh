@@ -18,39 +18,30 @@ fi
 #    - CVSSv3 preferred
 #    - fallback to CVSSv2
 # --------------------------------------------
-
 CRITICAL_COUNT=$(jq '
-  [.dependencies[].vulnerabilities[]? 
-   | (.cvssV3.baseScore // .cvssV2.score // 0) 
-   | select(. >= 9.0)] 
-  | length
+  [.dependencies[].vulnerabilities[]?
+   | (.cvssv3?.baseScore // .cvssv2?.score // 0)
+   | select(. >= 9)] | length
 ' "$REPORT")
 
 HIGH_COUNT=$(jq '
-  [.dependencies[].vulnerabilities[]? 
-   | (.cvssV3.baseScore // .cvssV2.score // 0) 
-   | select(. >= 7.0 and . < 9.0)] 
-  | length
+  [.dependencies[].vulnerabilities[]?
+   | (.cvssv3?.baseScore // .cvssv2?.score // 0)
+   | select(. >= 7 and . < 9)] | length
 ' "$REPORT")
 
 MEDIUM_COUNT=$(jq '
-  [.dependencies[].vulnerabilities[]? 
-   | (.cvssV3.baseScore // .cvssV2.score // 0) 
-   | select(. >= 4.0 and . < 7.0)] 
-  | length
+  [.dependencies[].vulnerabilities[]?
+   | (.cvssv3?.baseScore // .cvssv2?.score // 0)
+   | select(. >= 4 and . < 7)] | length
 ' "$REPORT")
 
 LOW_COUNT=$(jq '
-  [.dependencies[].vulnerabilities[]? 
-   | (.cvssV3.baseScore // .cvssV2.score // 0) 
-   | select(. > 0 and . < 4.0)] 
-  | length
+  [.dependencies[].vulnerabilities[]?
+   | (.cvssv3?.baseScore // .cvssv2?.score // 0)
+   | select(. > 0 and . < 4)] | length
 ' "$REPORT")
 
-TOTAL_COUNT=$(jq '
-  [.dependencies[].vulnerabilities[]?] 
-  | length
-' "$REPORT")
 
 # --------------------------------------------
 # 3️⃣ Print Summary (For Jenkins Console)
