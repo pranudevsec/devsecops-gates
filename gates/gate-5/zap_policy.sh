@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "🕷️ Gate-4: ZAP DAST Policy"
+echo "🕷️ Gate-5: ZAP DAST Policy"
 
 REPORT="zap-report/zap-report.html"
 
