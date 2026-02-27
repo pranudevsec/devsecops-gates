@@ -1,5 +1,9 @@
 title = "Enterprise Secret Detection Policy"
 
+
+[extend]
+useDefault = true
+
 [allowlist]
 description = "Ignore generated and non-developer files"
 
