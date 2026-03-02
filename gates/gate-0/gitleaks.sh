@@ -27,8 +27,7 @@ docker run --rm \
   -v "$CONFIG_FILE:/config.toml:ro" \
   zricethezav/gitleaks:latest \
   detect \
-    --source=/repo/backend \
-    --source=/repo/frontend \
+    --source=/repo \
     --no-git \
     --config=/config.toml \
     --report-format=json \
