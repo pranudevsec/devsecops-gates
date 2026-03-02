@@ -16,6 +16,7 @@ paths = [
   "^target/",
   "^coverage/",
   "^security-reports/",
+  "^\\.security-gates/",
   "dependency-check.*",
   "trivy-.*"
 ]
