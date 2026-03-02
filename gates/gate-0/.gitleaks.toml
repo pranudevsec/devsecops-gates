@@ -1,22 +1,21 @@
 title = "Enterprise Secret Detection Policy"
 
-
 [extend]
 useDefault = true
 
 [allowlist]
-description = "Ignore generated and non-developer files"
+description = "Ignore generated and internal security gate files"
 
 paths = [
-  "^\\.git/",
-  "^\\.scannerwork/",
-  "^node_modules/",
-  "^dist/",
-  "^build/",
-  "^target/",
-  "^coverage/",
-  "^security-reports/",
-  "^\\.security-gates/",
+  ".*/\\.git/.*",
+  ".*/\\.scannerwork/.*",
+  ".*/node_modules/.*",
+  ".*/dist/.*",
+  ".*/build/.*",
+  ".*/target/.*",
+  ".*/coverage/.*",
+  ".*/security-reports/.*",
+  ".*/\\.security-gates/.*",   # ✅ FIXED
   "dependency-check.*",
   "trivy-.*"
 ]
