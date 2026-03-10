@@ -3,7 +3,7 @@ set -euo pipefail
 
 echo "🔍 Gate-0A: Gitleaks Secret Detection"
 
-REPORT_DIR="$WORKSPACE/security-reports/gitleaks"
+REPORT_DIR="security-reports/gitleaks"
 REPORT_FILE="$REPORT_DIR/gitleaks-report.json"
 
 mkdir -p "$REPORT_DIR"
@@ -18,12 +18,12 @@ if [ ! -f "$CONFIG_FILE" ]; then
 fi
 
 echo "📄 Using Gitleaks config: $CONFIG_FILE"
-echo "📂 Jenkins workspace: $WORKSPACE"
+echo "📂 Current working directory: $(pwd)"
 
 # Run Gitleaks
 docker run --rm \
   -u $(id -u):$(id -g) \
-  -v "$WORKSPACE:/repo" \
+  -v "$PWD:/repo" \
   -v "$CONFIG_FILE:/config.toml:ro" \
   zricethezav/gitleaks:latest \
   detect \
@@ -33,7 +33,7 @@ docker run --rm \
     --report-format=json \
     --report-path=/repo/$REPORT_FILE || true
 
- # Ensure report always exists
+# Ensure report always exists
 if [ ! -f "$REPORT_FILE" ]; then
   echo "[]" > "$REPORT_FILE"
 fi
@@ -49,4 +49,6 @@ if [ "$COUNT" -gt 0 ]; then
 fi
 
 echo "✅ Gitleaks PASSED – No secrets detected"
-exit 0
+exit 0   
+
+
