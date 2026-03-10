@@ -23,7 +23,7 @@ echo "📂 Jenkins workspace: $WORKSPACE"
 # Run Gitleaks
 docker run --rm \
   -u $(id -u):$(id -g) \
-  -v "$WORKSPACE:/repo" 
+  -v "$WORKSPACE:/repo" \
   -v "$CONFIG_FILE:/config.toml:ro" \
   zricethezav/gitleaks:latest \
   detect \
@@ -33,7 +33,7 @@ docker run --rm \
     --report-format=json \
     --report-path=/repo/$REPORT_FILE || true
 
-# Ensure report always exists
+ # Ensure report always exists
 if [ ! -f "$REPORT_FILE" ]; then
   echo "[]" > "$REPORT_FILE"
 fi
