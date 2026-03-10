@@ -13,6 +13,9 @@ MAX_NEW_VULNS=0
 
 API_BASE="${SONAR_HOST_URL}/api"
 
+echo "⏳ Waiting for SonarQube analysis..."
+sleep 20
+
 RESPONSE=$(curl -sf \
   -u "${SONAR_TOKEN}:" \
   -H "Accept: application/json" \
