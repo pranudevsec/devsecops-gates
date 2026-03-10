@@ -16,21 +16,14 @@ API_BASE="${SONAR_HOST_URL}/api"
 echo "⏳ Waiting for SonarQube analysis..."
 sleep 20
 
-RESPONSE=$(curl -s 
--u "${SONAR_TOKEN}:" 
--H "Accept: application/json" 
-"${API_BASE}/measures/component?component=${SONAR_PROJECT_KEY}&metricKeys=new_coverage,new_bugs,new_vulnerabilities")
+RESPONSE=$(curl -sf \
+  -u "${SONAR_TOKEN}:" \
+  -H "Accept: application/json" \
+  "${API_BASE}/measures/component?component=${SONAR_PROJECT_KEY}&metricKeys=new_coverage,new_bugs,new_vulnerabilities")
 
-echo "🔎 Sonar API Response:"
-echo "$RESPONSE" | jq .
-
-NEW_COVERAGE=$(echo "$RESPONSE" | jq -r '.component.measures[]? | select(.metric=="new_coverage") | .value')
-NEW_BUGS=$(echo "$RESPONSE" | jq -r '.component.measures[]? | select(.metric=="new_bugs") | .value')
-NEW_VULNS=$(echo "$RESPONSE" | jq -r '.component.measures[]? | select(.metric=="new_vulnerabilities") | .value')
-
-NEW_COVERAGE=${NEW_COVERAGE:-0}
-NEW_BUGS=${NEW_BUGS:-0}
-NEW_VULNS=${NEW_VULNS:-0}
+NEW_COVERAGE=$(echo "$RESPONSE" | jq -r '.component.measures[] | select(.metric=="new_coverage") | .value // "0"')
+NEW_BUGS=$(echo "$RESPONSE" | jq -r '.component.measures[] | select(.metric=="new_bugs") | .value // "0"')
+NEW_VULNS=$(echo "$RESPONSE" | jq -r '.component.measures[] | select(.metric=="new_vulnerabilities") | .value // "0"')
 
 echo "📈 New Coverage        : ${NEW_COVERAGE}%"
 echo "🐞 New Bugs            : ${NEW_BUGS}"
@@ -38,25 +31,24 @@ echo "🔐 New Vulnerabilities : ${NEW_VULNS}"
 
 FAILED=0
 
-if (( $(echo "${NEW_COVERAGE} < ${MIN_NEW_COVERAGE}" | bc -l) )); then
-echo "❌ Coverage on New Code < ${MIN_NEW_COVERAGE}%"
-FAILED=1
+if (( $(echo "$NEW_COVERAGE < $MIN_NEW_COVERAGE" | bc -l) )); then
+  echo "❌ Coverage on New Code < ${MIN_NEW_COVERAGE}%"
+  FAILED=1
 fi
 
-if [ "${NEW_BUGS}" -gt "${MAX_NEW_BUGS}" ]; then
-echo "❌ New Bugs detected"
-FAILED=1
+if [ "$NEW_BUGS" -gt "$MAX_NEW_BUGS" ]; then
+  echo "❌ New Bugs detected"
+  FAILED=1
 fi
 
-if [ "${NEW_VULNS}" -gt "${MAX_NEW_VULNS}" ]; then
-echo "❌ New Vulnerabilities detected"
-FAILED=1
+if [ "$NEW_VULNS" -gt "$MAX_NEW_VULNS" ]; then
+  echo "❌ New Vulnerabilities detected"
+  FAILED=1
 fi
 
-if [ "${FAILED}" -eq 1 ]; then
-echo "❌ Gate-1 METRICS CHECK FAILED"
-exit 1
+if [ "$FAILED" -eq 1 ]; then
+  echo "❌ Gate-1 METRICS CHECK FAILED"
+  exit 1
 fi
 
 echo "✅ Gate-1 METRICS CHECK PASSED"
-
