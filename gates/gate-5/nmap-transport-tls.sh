@@ -34,7 +34,7 @@ fi
 
 if ! grep -q "X-Content-Type-Options" security-reports/nmap/http-header-report.txt; then
   echo "❌ Missing X-Content-Type-Options header"
-  exit 0
+  exit 1
 fi
 
 echo "✅ HTTP transport checks completed"
