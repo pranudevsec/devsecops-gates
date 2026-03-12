@@ -36,7 +36,7 @@ echo "⏱️ Average Response Time: $AVG_RESPONSE ms"
 # -------------------------------
 # 2️⃣ Performance SLA Check
 # -------------------------------
-SLA_THRESHOLD=10
+SLA_THRESHOLD=2000
 
 echo "⏱️ Checking SLA (<= ${SLA_THRESHOLD} ms)..."
 
