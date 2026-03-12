@@ -10,7 +10,7 @@ REPORT="zap-report/zap-report.html"
 # --------------------------------------------
 if [ ! -f "$REPORT" ]; then
   echo "❌ ZAP HTML report not found!"
-  exit 0
+  exit 2
 fi
 
 echo "🔎 Analyzing HTML report..."
@@ -20,10 +20,10 @@ echo "🔎 Analyzing HTML report..."
 # --------------------------------------------
 
 # Count High alerts
-HIGH_COUNT=$(grep -o "High (" "$REPORT" 2>/dev/null | wc -l || true)
+HIGH_COUNT=$(grep -o "High (" "$REPORT" 2>/dev/null | wc -l)
 
 # Count Medium alerts
-MEDIUM_COUNT=$(grep -o "Medium (" "$REPORT" 2>/dev/null | wc -l || true)
+MEDIUM_COUNT=$(grep -o "Medium (" "$REPORT" 2>/dev/null | wc -l)
 
 echo "High Alerts: $HIGH_COUNT"
 echo "Medium Alerts: $MEDIUM_COUNT"
