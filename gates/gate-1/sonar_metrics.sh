@@ -21,7 +21,9 @@ RESPONSE=$(curl -sf \
   -H "Accept: application/json" \
   "${API_BASE}/measures/component?component=${SONAR_PROJECT_KEY}&metricKeys=new_coverage,new_bugs,new_vulnerabilities")
 
-NEW_COVERAGE=$(echo "$RESPONSE" | jq -r '.component.measures[] | select(.metric=="new_coverage") | .period.value // "0"')
+NEW_COVERAGE=$(echo "$RESPONSE" | jq -r '.component.measures[]? | select(.metric=="new_coverage") | .period.value' | head -n1)
+
+NEW_COVERAGE=${NEW_COVERAGE:-0}
 NEW_BUGS=$(echo "$RESPONSE" | jq -r '.component.measures[] | select(.metric=="new_bugs") | .period.value // "0"')
 NEW_VULNS=$(echo "$RESPONSE" | jq -r '.component.measures[] | select(.metric=="new_vulnerabilities") | .period.value // "0"')
 
