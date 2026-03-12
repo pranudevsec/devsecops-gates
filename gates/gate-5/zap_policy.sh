@@ -20,10 +20,10 @@ echo "🔎 Analyzing HTML report..."
 # --------------------------------------------
 
 # Count High alerts
-HIGH_COUNT=$(grep -o "High (" "$REPORT" | wc -l)
+HIGH_COUNT=$(grep -o "High (" "$REPORT" 2>/dev/null | wc -l || true)
 
 # Count Medium alerts
-MEDIUM_COUNT=$(grep -o "Medium (" "$REPORT" | wc -l)
+MEDIUM_COUNT=$(grep -o "Medium (" "$REPORT" 2>/dev/null | wc -l || true)
 
 echo "High Alerts: $HIGH_COUNT"
 echo "Medium Alerts: $MEDIUM_COUNT"
