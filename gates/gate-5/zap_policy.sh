@@ -43,5 +43,4 @@ if [ "$MEDIUM_COUNT" -gt 2 ]; then
 fi
 
 echo "✅ DAST policy compliant"
-
-
+exit 0
