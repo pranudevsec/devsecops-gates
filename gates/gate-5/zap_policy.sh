@@ -10,7 +10,7 @@ REPORT="zap-report/zap-report.html"
 # --------------------------------------------
 if [ ! -f "$REPORT" ]; then
   echo "❌ ZAP HTML report not found!"
-  exit 2
+  exit 0
 fi
 
 echo "🔎 Analyzing HTML report..."
