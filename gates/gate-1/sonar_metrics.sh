@@ -29,7 +29,7 @@ echo "📈 New Coverage        : ${NEW_COVERAGE}%"
 echo "🐞 New Bugs            : ${NEW_BUGS}"
 echo "🔐 New Vulnerabilities : ${NEW_VULNS}"
 
-FAILED=1
+FAILED=0
 
 if (( $(echo "$NEW_COVERAGE < $MIN_NEW_COVERAGE" | bc -l) )); then
   echo "❌ Coverage on New Code < ${MIN_NEW_COVERAGE}%"
